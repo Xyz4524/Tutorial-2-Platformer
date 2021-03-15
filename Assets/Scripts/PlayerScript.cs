@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerScript : MonoBehaviour
 {
@@ -11,16 +12,27 @@ public class PlayerScript : MonoBehaviour
 
     public Text score;
 
+    public Text lives;
+
     public Text winText;
 
+    public Text loseText;
+
     private int scoreValue = 0;
+
+    private int livesValue = 3;
+
+    Animator anim;
 
     // Start is called before the first frame update
     void Start()
     {
         rd2d = GetComponent<Rigidbody2D>();
-        score.text = scoreValue.ToString();
+        score.text = "Score: " + scoreValue.ToString();
+        lives.text = "Lives: " + livesValue.ToString();
         winText.text = "";
+        loseText.text = "";
+        anim = GetComponent<Animator>();
     }
 
     void Update()
@@ -30,13 +42,56 @@ public class PlayerScript : MonoBehaviour
             Application.Quit();
         }
 
-        if (scoreValue >= 2)
+        if (Input.GetKeyDown(KeyCode.W))
+
         {
-            winText.text = "You Win!";
+
+            anim.SetInteger("State", 2);
+
+        }
+
+        if (Input.GetKeyUp(KeyCode.W))
+
+        {
+
+            anim.SetInteger("State", 0);
+
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+
+        {
+
+            anim.SetInteger("State", 1);
+
+        }
+
+        if (Input.GetKeyUp(KeyCode.D))
+
+        {
+
+            anim.SetInteger("State", 0);
+
+        }
+
+        if (scoreValue >= 4)
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+
+        if (scoreValue >= 4)
+        {
+            winText.text = "You Win! Game created by Michael Zeledon";
+        }
+
+        if (livesValue <= 0)
+        {
+            loseText.text = "You lose, try again.";
+            
         }
     }
 
-    // Update is called once per frame
+    
     void FixedUpdate()
     {
         float hozMovement = Input.GetAxis("Horizontal");
@@ -49,9 +104,18 @@ public class PlayerScript : MonoBehaviour
         if (collision.collider.tag == "Coin")
         {
             scoreValue += 1;
-            score.text = scoreValue.ToString();
+            score.text = "Score: " + scoreValue.ToString();
             Destroy(collision.collider.gameObject);
         }
+
+        if (collision.collider.tag == "Enemy")
+        {
+            livesValue -= 1;
+            lives.text = "Lives: " + livesValue.ToString();
+            Destroy(collision.collider.gameObject);
+        }
+
+       
 
     }
 
